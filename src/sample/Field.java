@@ -1,47 +1,52 @@
 package sample;
 
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 
-import java.util.Arrays;
+class Field {
+    int[][] field;
+    int[][] variantField;
+    int[][] holes;
+    private Label[][] labelField;
+    private BestVariant bestVariant;
 
-public class Field {
-    static int[][] field = new int[22][12];
-    static int[][] variusField = new int[22][12];
-    static int[][] well = new int[22][12];
-    static int[][] holes = new int[22][12];
-    static Label[][] labelField = new Label[20][10];
+    Field(int[][] field, int[][] variantField, int[][] holes, Label[][] labelField, BestVariant bestVariant){
+        this.field = new int[22][12];
+        this.variantField = new int[22][12];
+        this.holes = new int[22][12];
+        this.labelField = new Label[20][10];
+        this.bestVariant=bestVariant;
+
+    }
 
 
-    public static void returnVFtoF() {
+    void returnVFtoF() {
         for ( int i = 0; i < field[0].length; i++ ) {
             for ( int j = 0; j < field.length; j++ ) {
-                variusField[j][i] = field[j][i];
+                variantField[j][i] = field[j][i];
             }
         }
     }
 
-    public static void create(Pane pane) {
+    void create(Pane pane) {
         for (int k = 1; k < 21; k++) {
             for ( int z = 1; z < 11; z++ ) {
                 field[k][z]=0;
-                variusField[k][z]=0;
+                variantField[k][z]=0;
             }
         }
         for ( int i = 0; i < 12; i++ ) {
             field[0][i] = 1;
             field[21][i] = 1;
-            variusField[0][i] = 1;
-            variusField[21][i] = 1;
+            variantField[0][i] = 1;
+            variantField[21][i] = 1;
 
         }
         for ( int j = 0; j < 22; j++ ) {
             field[j][0] = 1;
             field[j][11] = 1;
-            variusField[j][0] = 1;
-            variusField[j][11] = 1;
+            variantField[j][0] = 1;
+            variantField[j][11] = 1;
 
         }
         for ( int k = 0; k < 20; k++ ) {
@@ -60,7 +65,7 @@ public class Field {
 
     }
 
-    public static void update() {
+    void update() {
         for ( int k = 1; k < 21; k++ ) {
             for ( int z = 1; z < 11; z++ ) {
                 if (field[k][z] == 1) {
@@ -74,17 +79,17 @@ public class Field {
         }
     }
 
-    public static void clearLineVariant(int n) {
+    private void clearLineVariant(int n) {
         if (n < 1 || n > 20) throw new NumberFormatException();
         for ( int i = n; i > 1; i-- ) {
             for ( int j = 0; j < 12; j++ ) {
-                variusField[i][j] = variusField[i - 1][j];
+                variantField[i][j] = variantField[i - 1][j];
             }
 
         }
     }
 
-    public static void clearLine(int n) {
+    private  void clearLine(int n) {
         if (n < 1 || n > 20) throw new NumberFormatException();
         for ( int i = n; i > 1; i-- ) {
             for ( int j = 0; j < 12; j++ ) {
@@ -94,90 +99,33 @@ public class Field {
         }
     }
 
-    public static boolean landing(int w, int h, int[][] tetramino) {
-        for ( int i = 0; i < tetramino.length; i++ ) {
-            for ( int j = 0; j < tetramino[0].length; j++ ) {
-                if (tetramino[i][j] == 1 && Field.field[i + h][j + w] == 1) {
-                    return true;
+    void setVariant() {
+        for ( int i = 0; i < bestVariant.figure.length; i++ ) {
+            for ( int j = 0; j < bestVariant.figure[0].length; j++ ) {
+                if (bestVariant.figure[i][j] == 1) {
+                    this.field[bestVariant.h + i][bestVariant.w + j] = 1;
+                    this.update();
                 }
             }
         }
-        return false;
+        bestVariant.clear();
     }
 
-    public static void tryVariant(int[][] tetr, int nowH, int nowW) {
-        for ( int i = 0; i < tetr.length; i++ ) {
-            for ( int j = 0; j < tetr[0].length; j++ ) {
-                if (tetr[i][j] == 1) {
-                    Field.variusField[nowH + i][nowW + j] = 1;
-                    Field.update();
-                }
-            }
-        }
-    }
-
-    public static int findMaxHeight() {
+    void clear(){
         for ( int k = 1; k < 21; k++ ) {
             for ( int z = 1; z < 11; z++ ) {
-                if (variusField[k][z] == 1) return k;
-            }
-
-        }
-        return 21;
-    }
-
-    public static void setVariant(int[][] tetr, int nowH, int nowW) {
-        for ( int i = 0; i < tetr.length; i++ ) {
-            for ( int j = 0; j < tetr[0].length; j++ ) {
-                if (tetr[i][j] == 1) {
-                    Field.field[nowH + i][nowW + j] = 1;
-                    Field.update();
-                }
-            }
-        }
-    }
-    public static int findWell() {
-        int answer=0;
-        for ( int k = 20; k > 1; k-- ) {
-            for ( int z = 1; z < 11; z++ ) {
-                if (variusField[k][z]==0 && variusField[k][z-1]==1 && variusField[k][z+1]==1
-                 && variusField[k-1][z]==0) {
-                    well[k][z]=1;
-                    answer +=1;
-                }
-            }
-            }
-            return answer;
-    }
-
-    public static int findHoles() {
-        int answer=0;
-        for ( int k = 2; k < 21; k++ ) {
-            for ( int z = 1; z < 11; z++ ) {
-                if (variusField[k][z]==0 && (variusField[k-1][z]==1 || holes[k-1][z]==1)) {
-                    holes[k][z]=1;
-                    answer ++;
-                }
-            }
-        }
-        return answer;
-    }
-
-    static void clear(){
-        for ( int k = 1; k < 21; k++ ) {
-            for ( int z = 1; z < 11; z++ ) {
-                well[k][z] = 0;
                 holes[k][z] = 0;
             }
             }
 
     }
-    static int findFillLineVariant(){
+
+    int findFillLineVariant(){
         int answer = 0;
         for ( int k = 1; k < 21; k++ ) {
             int counter = 0;
             for ( int z = 1; z < 11; z++ ) {
-                if (variusField[k][z]==1) counter++;
+                if (variantField[k][z]==1) counter++;
             }
             if (counter == 10) {
                 clearLineVariant(k);
@@ -188,7 +136,18 @@ public class Field {
             return answer;
         }
 
-    static int findFillLine(){
+    private  boolean landing(int w, int h, int[][] tetramino) {
+        for ( int i = 0; i < tetramino.length; i++ ) {
+            for ( int j = 0; j < tetramino[0].length; j++ ) {
+                if (tetramino[i][j] == 1 && this.field[i + h][j + w] == 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    int findFillLine(){
         int n = 0;
         for ( int k = 1; k < 21; k++ ) {
             int counter = 0;
@@ -201,30 +160,35 @@ public class Field {
                 k=1;
             }
         }
+        this.update();
         return n;
     }
-    public static int findHorizontalTransition() {
-        int answer=0;
-        for ( int k = 1; k < 21; k++ ) {
-            for ( int z = 1; z < 9; z++ ) {
-                if (variusField[k][z]!=variusField[k][z+1]) {
-                    answer ++;
+
+    void checkAllVariants(int[][] tetr){
+        for ( int k = 0; k < 4; k++ ) {
+            tetr = Tetramino.rotate(tetr);
+            for ( int z = 1; z < 12 - tetr[0].length; z++ ) {
+                 int nowW = 0;
+                int nowH = 0;
+                for ( int t = 1; t < 22 - tetr.length; t++ ) {
+                    if (this.landing(z, t, tetr)) {
+                        if (t!=1) {
+                            nowH = t - 1;
+                            nowW = z;
+                        }
+                        break;
+                    } else {
+                        nowH=t;
+                        nowW=z;
+                    }
                 }
+                bestVariant.checkVariant(tetr, nowH, nowW, this);
             }
         }
-        return answer;
     }
 
-    public static int findVerticalTransition() {
-        int answer=0;
-            for ( int z = 1; z < 11; z++ ) {
-                for ( int k = 1; k < 19; k++ ) {
-                if (variusField[k][z]!=variusField[k+1][z]) {
-                    answer ++;
-                }
-            }
-        }
-        return answer;
+    boolean hasBestVariant(){
+        return bestVariant.figure != null;
     }
 
 }
