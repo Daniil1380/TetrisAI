@@ -1,7 +1,5 @@
 package sample;
 
-import java.util.Arrays;
-
 public class BestVariant {
         int h;
         int w;
@@ -71,8 +69,7 @@ public class BestVariant {
                 min += 12 * (field.h + 1 - this.findMaxHeight(field));
                 min += 8 * this.findWell(field);
                 if (nowH < 10) min += 3 * (10 - nowH);
-                min += 45 * this.findHoles(field);
-                System.out.println(this.findMinHeight(field));
+                min += 38 * this.findHoles(field);
                 if (this.minScore > min) {
                     this.minScore = min;
                     this.h = nowH;

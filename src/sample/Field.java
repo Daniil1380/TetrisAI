@@ -62,8 +62,8 @@ class Field {
                 labelField[k][z] = new Label();
                 labelField[k][z].setMinHeight(30);
                 labelField[k][z].setMinWidth(30);
-                labelField[k][z].setTranslateY(k * 30 - 360);
-                labelField[k][z].setTranslateX(z * 30 - 160);
+                labelField[k][z].setTranslateY(k * 30 - h * 15 + 15);
+                labelField[k][z].setTranslateX(z * 30 - w * 15 + 15);
                 labelField[k][z].setStyle(
                         "-fx-background-color: #1d1d1d;"
                 );

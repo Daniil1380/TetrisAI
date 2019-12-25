@@ -35,7 +35,7 @@ public class Main extends Application {
                 {1, 1, 1}}));
         Pane root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("TetrisAI");
-        primaryStage.setScene(new Scene(root, 360, 600));
+        primaryStage.setScene(new Scene(root, w * 30, h * 30));
         primaryStage.show();
         BestVariant bestVariant = new BestVariant(new int[h+2][w+2]);
         Field field = new Field(new int[h+2][w+2], new int[h+2][w+2], new int[h+2][w+2], new Label[h][w],
