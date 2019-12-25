@@ -78,8 +78,8 @@ public class BestVariant {
                     this.h = nowH;
                     this.w = nowW;
                     this.figure = tetr;
-                    this.holes = field.holes;
                     this.hhh = this.findHoles(field);
+                    this.holes = field.holes;
                 }
             }
         }
