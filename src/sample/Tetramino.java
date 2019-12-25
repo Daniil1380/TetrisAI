@@ -1,42 +1,20 @@
 package sample;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 class Tetramino {
-    private static ArrayList<int[][]> t = new ArrayList<>();
 
+    int[][] massive;
 
-
-    Tetramino() {
-        t.add(new int[][]{{0, 1, 0},
-                {1, 1, 1}});
-        t.add(new int[][]{{0, 0, 1},
-                {1, 1, 1}});
-        t.add(new int[][] {{0, 1, 1},
-                {1, 1, 0}});
-        t.add(new int[][] {{1, 1, 1, 1}});
-        t.add(new int[][] {{1, 1, 0},
-                {0, 1, 1}});
-        t.add(new int[][] {{1, 1},
-                {1, 1}});
-        t.add(new int[][] {{1, 0, 0},
-                {1, 1, 1}});
-    }
-    int[][] create() {
-        Random random = new Random();
-        int num = random.nextInt(7);
-        return t.get(num);
+    Tetramino(int[][] massive){
+        this.massive=massive;
     }
 
-
-    int[][] rotate(int[][] in){
-        int arrR[][] = new int [in[0].length][in.length];
+    Tetramino rotate(){
+        int arrR[][] = new int [massive[0].length][massive.length];
         for (int i = 0; i < arrR.length; i++){
             for (int j = 0; j <arrR[i].length; j++){
-                arrR[i][j] = in[in.length-j-1][i];
+                arrR[i][j] = massive[massive.length-j-1][i];
             }
         }
-        return arrR;
+        return new Tetramino(arrR);
     }
 }
