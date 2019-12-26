@@ -2,19 +2,16 @@ package sample;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-
-import java.util.Arrays;
-
 class Field {
-    int[][] field;
-    int[][] variantField;
-    int[][] holes;
-    Label[][] labelField;
-    BestVariant bestVariant;
-    int h;
-    int w;
+    private boolean[][] field;
+    private Label[][] labelField;
+    private boolean[][] variantField;
+    private boolean[][] holes;
+    private BestVariant bestVariant;
+    private int h;
+    private int w;
 
-    Field(int[][] field, int[][] variantField, int[][] holes, Label[][] labelField, BestVariant bestVariant,
+    Field(boolean[][] field, boolean[][] variantField, boolean[][] holes, Label[][] labelField, BestVariant bestVariant,
           int h, int w){
         this.field =field;
         this.variantField = variantField;
@@ -23,10 +20,25 @@ class Field {
         this.bestVariant=bestVariant;
         this.h = h;
         this.w =w;
-
-
     }
 
+
+
+    boolean[][] getHoles(){
+        return this.holes;
+    }
+
+    boolean[][] getVariantField(){
+        return this.variantField;
+    }
+
+    int getH(){
+        return this.h;
+    }
+
+    int getW(){
+        return this.w;
+    }
 
     void returnVFtoF() {
         for ( int i = 0; i < field[0].length; i++ ) {
@@ -39,23 +51,21 @@ class Field {
     void create(Pane pane) {
         for (int k = 1; k < h +1; k++) {
             for ( int z = 1; z < w+1; z++ ) {
-                field[k][z]=0;
-                variantField[k][z]=0;
+                field[k][z]=false;
+                variantField[k][z]=false;
             }
         }
-        for ( int i = 0; i < w + 1; i++ ) {
-            field[0][i] = 1;
-            field[h + 1][i] = 1;
-            variantField[0][i] = 1;
-            variantField[h + 1][i] = 1;
-
+        for ( int i = 0; i < w + 2; i++ ) {
+            field[0][i] = true;
+            field[h + 1][i] = true;
+            variantField[0][i] = true;
+            variantField[h + 1][i] = true;
         }
         for ( int j = 0; j < h + 2; j++ ) {
-            field[j][0] = 1;
-            field[j][w + 1] = 1;
-            variantField[j][0] = 1;
-            variantField[j][w + 1] = 1;
-
+            field[j][0] = true;
+            field[j][w + 1] = true;
+            variantField[j][0] = true;
+            variantField[j][w + 1] = true;
         }
         for ( int k = 0; k < h; k++ ) {
             for ( int z = 0; z < w; z++ ) {
@@ -73,46 +83,40 @@ class Field {
 
     }
 
-    void update(boolean showHoles) {
+    void update() {
         for ( int k = 1; k < h + 1; k++ ) {
             for ( int z = 1; z < w + 1; z++ ) {
-                if (field[k][z] == 1) {
+                if (field[k][z]) {
                     labelField[k - 1][z - 1].setStyle(
-                            "-fx-background-color: #ffc0cb"
+                            "-fx-background-color: #ffc0cb; -fx-border-color: #ffffff;"
                     );
                 } else labelField[k - 1][z - 1].setStyle(
                         "-fx-background-color: #1d1d1d;"
                 );
-
-                if (bestVariant.holes[k][z]==1 && showHoles) {
-
-                }
             }
         }
     }
 
     private void clearLine(int n, boolean isReal) {
         if (n < 1 || n > h) throw new NumberFormatException();
-        int [][] abstractField;
+        boolean [][] abstractField;
         if (isReal) abstractField = field;
         else abstractField = variantField;
         for ( int i = n; i > 1; i-- ) {
-            for ( int j = 0; j < w + 2; j++ ) {
-                abstractField[i][j] = abstractField[i - 1][j];
-            }
+            if (w + 2 >= 0) System.arraycopy(abstractField[i - 1], 0, abstractField[i], 0, w + 2);
         }
         if (isReal) field = abstractField;
         else variantField = abstractField;
-        this.update(false);
+        this.update();
     }
 
 
     void setVariant() {
-        for ( int i = 0; i < bestVariant.figure.massive.length; i++ ) {
-            for ( int j = 0; j < bestVariant.figure.massive[0].length; j++ ) {
-                if (bestVariant.figure.massive[i][j] == 1) {
-                    this.field[bestVariant.h + i][bestVariant.w + j] = 1;
-                    this.update(false);
+        for ( int i = 0; i < bestVariant.getFigure().massive.length; i++ ) {
+            for ( int j = 0; j < bestVariant.getFigure().massive[0].length; j++ ) {
+                if (bestVariant.getFigure().massive[i][j]) {
+                    this.field[bestVariant.getH() + i][bestVariant.getW() + j] = true;
+                    this.update();
                 }
             }
         }
@@ -122,7 +126,7 @@ class Field {
     void clear(){
         for ( int k = 1; k < h + 1; k++ ) {
             for ( int z = 1; z < w + 1; z++ ) {
-                holes[k][z] = 0;
+                holes[k][z] = false;
             }
             }
 
@@ -131,7 +135,7 @@ class Field {
     private  boolean landing(int w, int h, Tetramino tetramino) {
         for ( int i = 0; i < tetramino.massive.length; i++ ) {
             for ( int j = 0; j < tetramino.massive[0].length; j++ ) {
-                if (tetramino.massive[i][j] == 1 && this.field[i + h][j + w] == 1) {
+                if (tetramino.massive[i][j] && this.field[i + h][j + w]) {
                     return true;
                 }
             }
@@ -145,23 +149,23 @@ class Field {
             int counter = 0;
             for ( int z = 1; z < w + 1; z++ ) {
                 if (isReal) {
-                    if (field[k][z] == 1) counter++;
-                } else  if (variantField[k][z] == 1) counter++;
+                    if (field[k][z]) counter++;
+                } else  if (variantField[k][z]) counter++;
             }
             if (counter == w) {
                 clearLine(k, isReal);
                 n++;
             }
         }
-        this.update(false);
+        this.update();
         return n;
     }
 
     void checkAllVariants(Tetramino tetr){
-        for ( int k = 0; k < 4; k++ ) {
+        for ( int k = 0; k < 4; k++ ) { //4 sides
             tetr=tetr.rotate();
             for ( int z = 1; z < w + 2 - tetr.massive[0].length; z++ ) {
-                 int nowW = 0;
+                int nowW = 0;
                 int nowH = 0;
                 for ( int t = 1; t < h + 2 - tetr.massive.length; t++ ) {
                     if (this.landing(z, t, tetr)) {
@@ -179,9 +183,7 @@ class Field {
             }
         }
     }
-
     boolean hasBestVariant(){
-        return bestVariant.figure != null;
+        return bestVariant.getFigure() != null;
     }
-
 }

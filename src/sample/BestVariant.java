@@ -1,16 +1,11 @@
 package sample;
 
-public class BestVariant {
-        int h;
-        int w;
-        Tetramino figure;
-        int[][] holes;
+class BestVariant {
+        private int h;
+        private int w;
+        private Tetramino figure;
         private int minScore  = Integer.MAX_VALUE;
-        int hhh;
 
-        BestVariant(int[][] holes){
-            this.holes = holes;
-        }
 
         void clear() {
             this.h=0;
@@ -18,13 +13,22 @@ public class BestVariant {
             this.figure = null;
             this.minScore = Integer.MAX_VALUE;
         }
+        int getH(){
+            return this.h;
+        }
+        int getW(){
+        return this.w;
+         }
+        Tetramino getFigure(){
+            return this.figure;
+        }
 
         private int findWell(Field field) {
             int answer=0;
-            for ( int k = field.h; k > 1; k-- ) {
-                for ( int z = 1; z < field.w + 1; z++ ) {
-                    if (field.variantField[k][z]==0 && field.variantField[k][z-1]==1 && field.variantField[k][z+1]==1
-                            && field.variantField[k-1][z]==0) {
+            for ( int k = field.getH(); k > 1; k-- ) {
+                for ( int z = 1; z < field.getW() + 1; z++ ) {
+                    if (!field.getVariantField()[k][z] && field.getVariantField()[k][z - 1] &&
+                            field.getVariantField()[k][z + 1] && !field.getVariantField()[k - 1][z]) {
                         answer +=1;
                     }
                 }
@@ -32,31 +36,20 @@ public class BestVariant {
             return answer;
         }
 
-        int findHoles(Field field) {
+        private int findHoles(Field field) {
             int answer=0;
-            for ( int k = 2; k <= field.h; k++ ) {
-                for ( int z = 1; z <= field.w; z++ ) {
-                        if (field.variantField[k][z]==0 && (field.variantField[k-1][z]==1 || field.holes[k-1][z]==1)) {
-                            field.holes[k][z]=1;
+            for ( int k = 2; k <= field.getH(); k++ ) {
+                for ( int z = 1; z <= field.getW(); z++ ) {
+                        if (!field.getVariantField()[k][z] && (field.getVariantField()[k - 1][z]
+                                || field.getHoles()[k - 1][z])) {
+                            field.getHoles()[k][z]=true;
                             answer ++;
                         }
-
                 }
             }
             return answer;
         }
 
-    private int findMinHeight(Field field) {
-        int answer=0;
-        for ( int k = 2; k < field.h + 1; k++ ) {
-            for ( int z = 1; z < field.w + 1; z++ ) {
-                if (field.variantField[k][z]==0 && (field.holes[k-1][z]==1)) {
-                    answer = k;
-                }
-            }
-        }
-        return answer;
-    }
 
         void checkVariant(Tetramino tetr, int nowH, int nowW, Field field){
             field.returnVFtoF();
@@ -66,7 +59,8 @@ public class BestVariant {
                 int lines;
                 this.tryVariant(tetr, nowH, nowW, field);
                 if ((lines = field.findFillLine(false)) > 0) min -= (int)Math.pow(10, lines);
-                min += 12 * (field.h + 1 - this.findMaxHeight(field));
+                //these are not magic numbers. Just empirically calculated coefficients
+                min += 12 * (field.getH() + 1 - this.findMaxHeight(field));
                 min += 8 * this.findWell(field);
                 if (nowH < 10) min += 3 * (10 - nowH);
                 min += 38 * this.findHoles(field);
@@ -75,27 +69,25 @@ public class BestVariant {
                     this.h = nowH;
                     this.w = nowW;
                     this.figure = tetr;
-                    this.hhh = this.findHoles(field);
-                    this.holes = field.holes;
                 }
             }
         }
 
         private int findMaxHeight(Field field) {
-            for ( int k = 1; k < field.h + 1; k++ ) {
-                for ( int z = 1; z < field.w + 1; z++ ) {
-                    if (field.variantField[k][z] == 1) return k;
+            for ( int k = 1; k < field.getH() + 1; k++ ) {
+                for ( int z = 1; z < field.getW() + 1; z++ ) {
+                    if (field.getVariantField()[k][z]) return k;
                 }
             }
-            return field.variantField.length - 1;
+            return field.getVariantField().length - 1;
         }
 
         private void tryVariant(Tetramino tetr, int nowH, int nowW, Field field) {
             for ( int i = 0; i < tetr.massive.length; i++ ) {
                 for ( int j = 0; j < tetr.massive[0].length; j++ ) {
-                    if (tetr.massive[i][j] == 1) {
-                        field.variantField[nowH + i][nowW + j] = 1;
-                        field.update(false);
+                    if (tetr.massive[i][j]) {
+                        field.getVariantField()[nowH + i][nowW + j] = true;
+                        field.update();
                     }
                 }
             }
