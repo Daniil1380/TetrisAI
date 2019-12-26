@@ -21,6 +21,7 @@ public class Main extends Application {
         int h = 20;
         int w = 10;
         int speed = 10;
+        int size = 30;
         if (answer.equals("Нет")) {
         System.out.println("Ввведите высоту поля");
         h = scanner.nextInt();
@@ -32,7 +33,7 @@ public class Main extends Application {
         if (speed > 60) speed = 60;
         Pane root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("TetrisAI");
-        primaryStage.setScene(new Scene(root, w * 30, h * 30));
+        primaryStage.setScene(new Scene(root, w * size, h * size));
         primaryStage.setResizable(false);
         primaryStage.show();
         BestVariant bestVariant = new BestVariant();
@@ -54,7 +55,7 @@ public class Main extends Application {
                 {true, true, true}}));
 
         Game game = new Game(root, field);
-        game.go(list, speed);
+        game.go(list, speed, size);
 
     }
 

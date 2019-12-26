@@ -8,6 +8,7 @@ class Tetramino {
         this.massive=massive;
     }
 
+
     Tetramino rotate(){
         boolean arrR[][] = new boolean[massive[0].length][massive.length];
         for (int i = 0; i < arrR.length; i++){

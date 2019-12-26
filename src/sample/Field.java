@@ -48,7 +48,7 @@ class Field {
         }
     }
 
-    void create(Pane pane) {
+    void create(Pane pane, int size) {
         for (int k = 1; k < h +1; k++) {
             for ( int z = 1; z < w+1; z++ ) {
                 field[k][z]=false;
@@ -70,10 +70,10 @@ class Field {
         for ( int k = 0; k < h; k++ ) {
             for ( int z = 0; z < w; z++ ) {
                 labelField[k][z] = new Label();
-                labelField[k][z].setMinHeight(30);
-                labelField[k][z].setMinWidth(30);
-                labelField[k][z].setTranslateY(k * 30 - h * 15 + 15);
-                labelField[k][z].setTranslateX(z * 30 - w * 15 + 15);
+                labelField[k][z].setMinHeight(size);
+                labelField[k][z].setMinWidth(size);
+                labelField[k][z].setTranslateY(k *size - (h-1) * (size >> 1));
+                labelField[k][z].setTranslateX(z * size - (w-1) * (size >> 1));
                 labelField[k][z].setStyle(
                         "-fx-background-color: #1d1d1d;"
                 );
@@ -91,7 +91,7 @@ class Field {
                             "-fx-background-color: #ffc0cb; -fx-border-color: #ffffff;"
                     );
                 } else labelField[k - 1][z - 1].setStyle(
-                        "-fx-background-color: #1d1d1d;"
+                        "-fx-background-color: #1d1d1d; -fx-border-color: #808080;"
                 );
             }
         }
